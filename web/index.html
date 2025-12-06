@@ -5,46 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Phishing Detector">
+    <meta name="theme-color" content="#667eea">
     <title>Phishing Link Detector</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 30px;
             max-width: 500px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: auto;
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            color: #86868b;
+            margin-bottom: 32px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .config-section {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .config-section.show {
+            display: block;
+        }
+
+        .config-toggle {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .config-toggle button {
+            background: none;
+            border: none;
+            color: #667eea;
             font-size: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .config-toggle button:active {
+            opacity: 0.7;
         }
 
         .input-group {
@@ -54,42 +95,49 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #1d1d1f;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
         }
 
-        input[type="url"] {
+        input[type="url"],
+        input[type="text"] {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 16px;
+            border: 2px solid #d2d2d7;
+            border-radius: 12px;
+            font-size: 17px;
+            transition: all 0.2s;
             -webkit-appearance: none;
+            background: white;
+            color: #1d1d1f;
         }
 
-        input[type="url"]:focus {
+        input[type="url"]:focus,
+        input[type="text"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
         button {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
             -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
         }
 
         button:active {
             transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
 
         button:disabled {
@@ -100,18 +148,22 @@
 
         .loading {
             text-align: center;
-            margin: 20px 0;
+            margin: 24px 0;
             display: none;
+        }
+
+        .loading.show {
+            display: block;
         }
 
         .spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #667eea;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+            width: 44px;
+            height: 44px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
         }
 
         @keyframes spin {
@@ -119,76 +171,110 @@
             100% { transform: rotate(360deg); }
         }
 
+        .loading-text {
+            color: #86868b;
+            font-size: 15px;
+        }
+
         .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 10px;
+            margin-top: 24px;
+            padding: 24px;
+            border-radius: 16px;
             display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result.phishing {
-            background: #fee;
-            border: 2px solid #fcc;
+            background: #fff5f5;
+            border: 2px solid #ff3b30;
         }
 
         .result.legitimate {
-            background: #efe;
-            border: 2px solid #cfc;
+            background: #f0fdf4;
+            border: 2px solid #34c759;
         }
 
         .result-header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .result-icon {
-            font-size: 32px;
-            margin-right: 10px;
+            font-size: 36px;
+            margin-right: 12px;
+            line-height: 1;
         }
 
         .result-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
-            color: #333;
+            color: #1d1d1f;
+            letter-spacing: -0.3px;
         }
 
         .result.phishing .result-title {
-            color: #c00;
+            color: #ff3b30;
         }
 
         .result.legitimate .result-title {
-            color: #0a0;
+            color: #34c759;
         }
 
         .score {
-            font-size: 18px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
 
         .result.phishing .score {
-            color: #c00;
+            color: #ff3b30;
         }
 
         .result.legitimate .score {
-            color: #0a0;
+            color: #34c759;
         }
 
         .confidence {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 15px;
+            color: #86868b;
+            margin-bottom: 16px;
+        }
+
+        .url-display {
+            font-size: 13px;
+            color: #86868b;
+            margin-top: 12px;
+            word-break: break-all;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
         }
 
         .reasons {
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .reasons-title {
             font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
+            margin-bottom: 12px;
+            color: #1d1d1f;
+            font-size: 16px;
         }
 
         .reasons-list {
@@ -196,10 +282,12 @@
         }
 
         .reasons-list li {
-            padding: 8px 0;
-            padding-left: 20px;
+            padding: 10px 0;
+            padding-left: 24px;
             position: relative;
-            color: #555;
+            color: #515154;
+            font-size: 15px;
+            line-height: 1.5;
         }
 
         .reasons-list li:before {
@@ -208,37 +296,115 @@
             left: 0;
             color: #667eea;
             font-weight: bold;
+            font-size: 20px;
+            line-height: 1;
         }
 
         .error {
             margin-top: 20px;
-            padding: 15px;
-            background: #fee;
-            border: 2px solid #fcc;
-            border-radius: 10px;
-            color: #c00;
+            padding: 16px;
+            background: #fff5f5;
+            border: 2px solid #ff3b30;
+            border-radius: 12px;
+            color: #ff3b30;
             display: none;
+            font-size: 15px;
+            line-height: 1.5;
         }
 
-        .url-display {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-            word-break: break-all;
+        .error.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .info-text {
+            font-size: 13px;
+            color: #86868b;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* iPhone specific optimizations */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            input[type="url"],
+            input[type="text"] {
+                font-size: 16px; /* Prevents zoom on focus in iOS */
+            }
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
             .container {
-                padding: 20px;
+                padding: 24px 20px;
+                border-radius: 20px;
             }
 
             h1 {
-                font-size: 24px;
+                font-size: 28px;
             }
 
-            input[type="url"], button {
-                padding: 12px;
+            .subtitle {
                 font-size: 14px;
+            }
+
+            input[type="url"],
+            input[type="text"],
+            button {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            .result {
+                padding: 20px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            }
+
+            .container {
+                background: #1d1d1f;
+            }
+
+            h1, .result-title, .reasons-title {
+                color: #f5f5f7;
+            }
+
+            .subtitle, .confidence, .url-display, .info-text {
+                color: #86868b;
+            }
+
+            label {
+                color: #f5f5f7;
+            }
+
+            input[type="url"],
+            input[type="text"] {
+                background: #2c2c2e;
+                border-color: #3a3a3c;
+                color: #f5f5f7;
+            }
+
+            .config-section {
+                background: #2c2c2e;
+            }
+
+            .result.phishing {
+                background: #2d1a1a;
+            }
+
+            .result.legitimate {
+                background: #1a2d1a;
             }
         }
     </style>
@@ -248,6 +414,26 @@
         <h1>🛡️ Phishing Detector</h1>
         <p class="subtitle">Powered by Machine Learning</p>
 
+        <div class="config-toggle">
+            <button onclick="toggleConfig()" id="configToggle">⚙️ Configure Backend URL</button>
+        </div>
+
+        <div class="config-section" id="configSection">
+            <div class="input-group">
+                <label for="backendUrlInput">Backend Server URL</label>
+                <input 
+                    type="text" 
+                    id="backendUrlInput" 
+                    placeholder="http://192.168.1.100:5000/predict"
+                    autocomplete="url"
+                >
+                <p class="info-text">
+                    Enter your backend server URL. If running locally, use your computer's IP address.
+                </p>
+            </div>
+            <button onclick="saveBackendUrl()">Save Backend URL</button>
+        </div>
+
         <div class="input-group">
             <label for="urlInput">Enter URL to Check</label>
             <input 
@@ -255,6 +441,7 @@
                 id="urlInput" 
                 placeholder="https://example.com"
                 autocomplete="url"
+                enterkeyhint="go"
             >
         </div>
 
@@ -262,7 +449,7 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p style="margin-top: 10px; color: #666;">Analyzing URL...</p>
+            <p class="loading-text">Analyzing URL...</p>
         </div>
 
         <div class="error" id="error"></div>
@@ -283,13 +470,42 @@
     </div>
 
     <script>
-        // Backend URL - Update this to your backend server
-        // For local testing: http://localhost:5000/predict
-        // For production: https://your-backend-url.com/predict
-        const BACKEND_URL = 'http://localhost:5000/predict';
-        
-        // For iPhone to access computer's backend, use your computer's IP:
-        // const BACKEND_URL = 'http://YOUR_COMPUTER_IP:5000/predict';
+        // Get backend URL from localStorage or use default
+        function getBackendUrl() {
+            const saved = localStorage.getItem('backendUrl');
+            if (saved) {
+                return saved;
+            }
+            // Try to auto-detect if on same network
+            const hostname = window.location.hostname;
+            if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+                // If accessing via IP, use same IP for backend
+                return `http://${hostname}:5000/predict`;
+            }
+            // Default fallback
+            return 'http://localhost:5000/predict';
+        }
+
+        function saveBackendUrl() {
+            const url = document.getElementById('backendUrlInput').value.trim();
+            if (url) {
+                localStorage.setItem('backendUrl', url);
+                showMessage('Backend URL saved!', 'success');
+                toggleConfig();
+            } else {
+                showError('Please enter a valid backend URL');
+            }
+        }
+
+        function toggleConfig() {
+            const section = document.getElementById('configSection');
+            const input = document.getElementById('backendUrlInput');
+            section.classList.toggle('show');
+            if (section.classList.contains('show')) {
+                input.value = getBackendUrl();
+                input.focus();
+            }
+        }
 
         function checkUrl() {
             const urlInput = document.getElementById('urlInput');
@@ -306,13 +522,16 @@
             }
 
             // Hide previous results
-            result.style.display = 'none';
-            error.style.display = 'none';
+            result.classList.remove('show');
+            error.classList.remove('show');
             
             // Show loading
-            loading.style.display = 'block';
+            loading.classList.add('show');
             checkButton.disabled = true;
             checkButton.textContent = 'Checking...';
+
+            // Get backend URL
+            const BACKEND_URL = getBackendUrl();
 
             // Prepare request
             const requestBody = JSON.stringify({ url: url });
@@ -337,11 +556,18 @@
                 displayResult(data);
             })
             .catch(err => {
-                showError('Network error: ' + err.message + 
-                    '\n\nMake sure the backend server is running on port 5000.');
+                let errorMsg = 'Network error: ' + err.message;
+                if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                    errorMsg += '\n\nMake sure:\n';
+                    errorMsg += '• Backend server is running\n';
+                    errorMsg += '• Backend URL is correct\n';
+                    errorMsg += '• iPhone and computer are on same WiFi\n';
+                    errorMsg += '• Firewall allows port 5000';
+                }
+                showError(errorMsg);
             })
             .finally(() => {
-                loading.style.display = 'none';
+                loading.classList.remove('show');
                 checkButton.disabled = false;
                 checkButton.textContent = 'Check URL';
             });
@@ -390,26 +616,46 @@
             }
 
             // Show result
-            result.style.display = 'block';
+            result.classList.add('show');
             
-            // Scroll to result
-            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Scroll to result smoothly
+            setTimeout(() => {
+                result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         function showError(message) {
             const error = document.getElementById('error');
             error.textContent = message;
-            error.style.display = 'block';
-            error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            error.classList.add('show');
+            setTimeout(() => {
+                error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function showMessage(message, type) {
+            // Simple message display (could be enhanced)
+            alert(message);
         }
 
         // Allow Enter key to submit
         document.getElementById('urlInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 checkUrl();
             }
         });
+
+        // Load saved backend URL on page load
+        window.addEventListener('load', function() {
+            const savedUrl = localStorage.getItem('backendUrl');
+            if (savedUrl) {
+                // Backend URL is saved, ready to use
+            }
+        });
+
+        // Prevent zoom on input focus (iOS)
+        document.addEventListener('touchstart', function() {}, { passive: true });
     </script>
 </body>
 </html>
-

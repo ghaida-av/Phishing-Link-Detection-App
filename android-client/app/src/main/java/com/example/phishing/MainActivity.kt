@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONObject
 import java.io.IOException
 
@@ -54,10 +55,8 @@ class MainActivity : AppCompatActivity() {
 
         val json = JSONObject()
         json.put("url", url)
-        val body = RequestBody.create(
-            MediaType.get("application/json; charset=utf-8"),
-            json.toString()
-        )
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = RequestBody.create(mediaType, json.toString())
 
         val request = Request.Builder()
             .url(BACKEND_URL)
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val respBody = response.body()?.string()
+                val respBody = response.body?.string()
                 runOnUiThread {
                     progressBar.visibility = android.view.View.GONE
                     checkButton.isEnabled = true

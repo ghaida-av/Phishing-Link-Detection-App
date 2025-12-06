@@ -1,6 +1,6 @@
 # 📱 iPhone Setup Guide - Step by Step
 
-Complete guide to use Phishing Detector on any iPhone or iPad.
+Complete guide to use the Phishing Detector on any iPhone.
 
 ---
 
@@ -17,96 +17,97 @@ Complete guide to use Phishing Detector on any iPhone or iPad.
 **On Windows:**
 1. Open **Command Prompt** (cmd)
 2. Type: `ipconfig`
-3. Look for **IPv4 Address** under your WiFi adapter
+3. Look for "IPv4 Address" under your WiFi adapter
 4. **Copy that IP address**
 
 ---
 
-### Step 2: Start Backend Server
+### Step 2: Update Backend URL in index.html
 
-**On your computer:**
+1. Open the file: `web/index.html`
+2. Find this line (around line 400):
+   ```javascript
+   const BACKEND_URL = 'http://localhost:5000/predict';
+   ```
+3. Replace `localhost` with your IP address:
+   ```javascript
+   const BACKEND_URL = 'http://192.168.1.100:5000/predict';
+   ```
+   (Use YOUR actual IP address from Step 1)
 
-1. Open **Terminal** (Mac) or **Command Prompt** (Windows)
+4. **Save the file**
+
+---
+
+### Step 3: Start Backend Server
+
+1. Open **Terminal**
 2. Navigate to backend folder:
    ```bash
    cd /Users/ghaidaa/Phishing-Link-Detection-App/backend
    ```
-3. Activate virtual environment (if you have one):
-   ```bash
-   source venv/bin/activate  # Mac/Linux
-   # OR
-   venv\Scripts\activate     # Windows
-   ```
-4. Start the server:
+3. Start the server:
    ```bash
    python app.py
    ```
-5. You should see: `Running on http://0.0.0.0:5000`
-6. **Keep this terminal open!**
+4. You should see: `Running on http://0.0.0.0:5000`
+5. **Keep this terminal open** (don't close it)
 
 ---
 
-### Step 3: Start Web Server
+### Step 4: Start Web Server
 
-**Open a NEW Terminal window:**
-
-1. Navigate to web folder:
+1. Open a **NEW Terminal window** (keep backend running)
+2. Navigate to web folder:
    ```bash
    cd /Users/ghaidaa/Phishing-Link-Detection-App/web
    ```
-2. Start web server:
+3. Start web server:
    ```bash
    python3 -m http.server 8000
    ```
-3. You should see: `Serving HTTP on 0.0.0.0 port 8000`
-4. **Keep this terminal open too!**
+4. You should see: `Serving HTTP on 0.0.0.0 port 8000`
+5. **Keep this terminal open too**
 
 ---
 
-### Step 4: Configure on iPhone
+### Step 5: Connect iPhone to Same WiFi
 
-1. **Make sure iPhone and computer are on the SAME WiFi network**
-2. On iPhone, open **Safari**
-3. Go to: `http://YOUR_IP_ADDRESS:8000`
-   - Example: `http://192.168.1.100:8000`
-   - Replace `YOUR_IP_ADDRESS` with the IP from Step 1
+1. On your iPhone, go to **Settings** → **Wi-Fi**
+2. Make sure you're connected to the **same WiFi network** as your computer
+3. Check the WiFi name matches
 
+---
+
+### Step 6: Open on iPhone
+
+1. On iPhone, open **Safari** (not Chrome)
+2. In the address bar, type:
+   ```
+   http://YOUR_IP_ADDRESS:8000
+   ```
+   Example: `http://192.168.1.100:8000`
+3. Press **Go**
 4. The app should load!
 
-5. **Configure Backend URL:**
-   - Tap **"⚙️ Configure Backend URL"**
-   - Enter: `http://YOUR_IP_ADDRESS:5000/predict`
-   - Example: `http://192.168.1.100:5000/predict`
-   - Tap **"Save Backend URL"**
+---
+
+### Step 7: Add to Home Screen (Optional but Recommended)
+
+1. In Safari, tap the **Share button** (square with arrow up)
+2. Scroll down and tap **"Add to Home Screen"**
+3. Tap **"Add"** (top right)
+4. Now you have an app icon on your home screen!
+5. Tap it anytime to open the app
 
 ---
 
-### Step 5: Test It!
+## ✅ Test It
 
-1. Enter a URL (e.g., `https://www.google.com`)
+1. Enter a URL: `https://www.google.com`
 2. Tap **"Check URL"**
 3. Wait a few seconds
-4. See the results! 🎉
-
----
-
-## 📲 Add to Home Screen (Make It Like an App)
-
-1. In Safari, tap the **Share** button (square with arrow up)
-2. Scroll down and tap **"Add to Home Screen"**
-3. Edit the name if you want (or keep "Phishing Detector")
-4. Tap **"Add"** (top right)
-5. **Done!** You now have an app icon on your home screen!
-
----
-
-## ✅ Works On:
-
-- ✅ iPhone (all models)
-- ✅ iPad
-- ✅ iPod Touch
-- ✅ Any iOS device with Safari
-- ✅ Works on iOS 12 and later
+4. You should see the result!
 
 ---
 
@@ -115,86 +116,95 @@ Complete guide to use Phishing Detector on any iPhone or iPad.
 ### "Can't connect" or "Network error"
 
 **Check these:**
+1. ✅ Backend server is running (Step 3)
+2. ✅ Web server is running (Step 4)
+3. ✅ iPhone and computer on same WiFi
+4. ✅ IP address is correct in `index.html`
+5. ✅ Firewall isn't blocking ports 5000 and 8000
 
-1. ✅ Backend server is running (`python app.py`)
-2. ✅ Web server is running (`python3 -m http.server 8000`)
-3. ✅ iPhone and computer are on **same WiFi**
-4. ✅ IP address is correct
-5. ✅ Backend URL is configured correctly
-6. ✅ Firewall isn't blocking ports 5000 and 8000
-
-**Fix Firewall (Mac):**
+**Fix firewall (Mac):**
 1. System Settings → Network → Firewall
-2. Make sure it allows Python/terminal connections
+2. Make sure it's not blocking connections
 
-**Fix Firewall (Windows):**
-1. Windows Defender → Firewall
+**Fix firewall (Windows):**
+1. Windows Defender Firewall
 2. Allow Python through firewall
 
 ---
 
-### "Backend URL not working"
+### "Backend URL is wrong"
 
-1. Tap **"⚙️ Configure Backend URL"**
-2. Make sure it's: `http://YOUR_IP:5000/predict`
-3. **NOT** `localhost` (that won't work from iPhone)
-4. **NOT** `127.0.0.1` (that won't work either)
-5. Must be your computer's actual IP address
-
----
-
-### "Page won't load"
-
-1. Check web server is running
-2. Try: `http://YOUR_IP:8000` in Safari
-3. Make sure no typos in the URL
-4. Try refreshing the page
+**Double-check:**
+1. Open `web/index.html`
+2. Find `BACKEND_URL`
+3. Make sure it has your computer's IP (not localhost)
+4. Format: `http://192.168.1.100:5000/predict`
 
 ---
 
-### "Results not showing"
+### "Page won't load on iPhone"
 
-1. Check backend server terminal for errors
-2. Make sure backend URL is correct
-3. Try a simple URL first: `https://www.google.com`
+**Try:**
+1. Make sure you're using **Safari** (not Chrome)
+2. Check the URL is correct: `http://IP:8000`
+3. Try refreshing the page
+4. Make sure both servers are running
+
+---
+
+### "App looks weird on iPhone"
+
+**This is normal!** The app is optimized for iPhone:
+- Full screen on iPhone
+- Rounded corners on iPad/desktop
+- Touch-friendly buttons
+- Safe area support (iPhone X and newer)
+
+---
+
+## 📋 Checklist
+
+Before using on iPhone:
+- [ ] Found computer's IP address
+- [ ] Updated BACKEND_URL in index.html
+- [ ] Backend server running (port 5000)
+- [ ] Web server running (port 8000)
+- [ ] iPhone on same WiFi network
+- [ ] Opened in Safari (not Chrome)
+- [ ] Added to Home Screen (optional)
+
+---
+
+## 🎯 Quick Reference
+
+**Backend URL format:**
+```
+http://YOUR_IP:5000/predict
+```
+
+**Web app URL format:**
+```
+http://YOUR_IP:8000
+```
+
+**Example:**
+- IP: `192.168.1.100`
+- Backend: `http://192.168.1.100:5000/predict`
+- Web app: `http://192.168.1.100:8000`
 
 ---
 
 ## 💡 Pro Tips
 
-1. **Bookmark the page** for quick access
+1. **Bookmark the URL** in Safari for quick access
 2. **Add to Home Screen** for app-like experience
-3. **Save backend URL** - it's saved automatically
-4. **Keep servers running** while using the app
-
----
-
-## 🔄 Daily Use
-
-**Every time you want to use it:**
-
-1. Start backend: `cd backend && python app.py`
-2. Start web server: `cd web && python3 -m http.server 8000`
-3. Open on iPhone: `http://YOUR_IP:8000`
-4. Use the app!
-
-**Tip:** Create shortcuts/aliases to make this faster!
-
----
-
-## 📋 Quick Reference
-
-- **Backend URL format**: `http://YOUR_IP:5000/predict`
-- **Web URL format**: `http://YOUR_IP:8000`
-- **Backend port**: 5000
-- **Web port**: 8000
-- **Required**: Same WiFi network
+3. **Keep servers running** while using the app
+4. **Check IP address** if you change WiFi networks
 
 ---
 
 ## 🎉 That's It!
 
-Your Phishing Detector now works on any iPhone! 🚀
+Your Phishing Detector now works perfectly on iPhone! 🚀
 
-Need help? Check the troubleshooting section above!
-
+**Need help?** Check the troubleshooting section above.
